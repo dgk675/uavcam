@@ -1,0 +1,5 @@
+one_button = true
+one_button_pin = 3
+mavlink = false
+process_videos = false
+output_path = "./captures"
