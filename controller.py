@@ -7,14 +7,6 @@ from loguru import logger
 from component.camera import Camera, ExifGpsData
 
 
-def on_short_press():
-    logger.debug("short press detected")
-
-
-def on_long_press():
-    logger.debug("long press detected")
-
-
 def process_command(board: MSPy, command: str):
     if board.send_RAW_msg(MSPy.MSPCodes[command], data=[]):
         dataHandler = board.receive_msg()
