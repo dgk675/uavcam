@@ -4,7 +4,7 @@ import time
 from yamspy import MSPy
 from loguru import logger
 
-from component.camera import Camera
+from component.camera import Camera, ExifGpsData
 
 
 def on_short_press():
@@ -22,29 +22,15 @@ def process_command(board: MSPy, command: str):
 
 
 if __name__ == "__main__":
+    # load config
     with open("config.toml", "rb") as f:
         config = tomli.load(f)
 
+    # initialize camera module
     logger.debug("Setting up camera module")
-
     camera = Camera(output_path=config["output_path"])
 
     previous_rc_high = False
-
-    # logger.debug("Taking photo")
-    # camera.capture_photo()
-
-    # logger.debug("Starting video capture")
-    # camera.start_recording()
-
-    # time.sleep(5)
-
-    # camera.capture_photo()
-
-    # time.sleep(5)
-
-    # logger.debug("Stoppint video capture")
-    # camera.stop_recording()
 
     with MSPy(
         device=config["msp_port"],
@@ -60,16 +46,37 @@ if __name__ == "__main__":
 
             process_command(board, "MSP_RC")
             process_command(board, "MSP_RAW_GPS")
-            print(board.RC["channels"])
-            # print(board.GPS_DATA)
+            logger.trace(board.RC["channels"])
+            logger.trace(board.GPS_DATA)
 
+            # photo handling
             if (
-                board.RC["channels"][config["msp_rc_channel"] - 1]
-                >= config["msp_rc_threshold"]
+                board.RC["channels"][config["msp_photo_channel"] - 1]
+                >= config["msp_photo_threshold"]
             ):
                 if not previous_rc_high:
-                    logger.debug("Capturing photo..")
-                    camera.capture_photo()
+                    gps_data = None
+
+                    if board.GPS_DATA["fix"]:
+                        gps_data = ExifGpsData(
+                            latitude=board.GPS_DATA["lat"] * 1e-07,
+                            longitude=board.GPS_DATA["lon"] * 1e-07,
+                            altitude=board.GPS_DATA["alt"],
+                            speed=board.GPS_DATA["speed"] * 1e-01,
+                            heading=board.GPS_DATA["ground_course"] * 1e-01,
+                        )
+                    camera.capture_photo(gps_data)
                     previous_rc_high = True
             else:
                 previous_rc_high = False
+
+            # video handling
+            if (
+                board.RC["channels"][config["msp_video_channel"] - 1]
+                >= config["msp_video_threshold"]
+            ):
+                if not camera.is_recording:
+                    camera.start_recording()
+            else:
+                if camera.is_recording:
+                    camera.stop_recording()
