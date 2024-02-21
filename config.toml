@@ -1,5 +1,3 @@
-one_button = false
-one_button_pin = 3
 msp_port="/dev/ttyACM0"
 msp_baudrate=115200
 msp_rc_channel=12

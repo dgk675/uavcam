@@ -5,7 +5,6 @@ from yamspy import MSPy
 from loguru import logger
 
 from component.camera import Camera
-from component.gpio import GPIO
 
 
 def on_short_press():
@@ -25,15 +24,6 @@ def process_command(board: MSPy, command: str):
 if __name__ == "__main__":
     with open("config.toml", "rb") as f:
         config = tomli.load(f)
-
-    # if config["one_button"]:
-    #     gpio_pin = config["one_button_pin"]
-    #     gpio = GPIO(
-    #         gpio_pin,
-    #         on_short_press=on_short_press,
-    #         on_long_press=on_long_press,
-    #         long_press_threshold_ms=2000,
-    #     )
 
     logger.debug("Setting up camera module")
 

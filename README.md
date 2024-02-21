@@ -9,7 +9,7 @@
     ```
 3. Install python dependencies
     ```sh
-    pip install loguru tomli gpiozero yamspy
+    pip install loguru tomli yamspy
     ```
 
 
