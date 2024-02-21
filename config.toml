@@ -1,5 +1,8 @@
-one_button = true
+one_button = false
 one_button_pin = 3
-mavlink = false
+msp_port="/dev/ttyACM0"
+msp_baudrate=115200
+msp_rc_channel=12
+msp_rc_threshold = 1750
 process_videos = false
 output_path = "./captures"
